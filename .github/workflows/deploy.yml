@@ -1,0 +1,38 @@
+name: Deploy to AWS S3
+
+on:
+  push:
+    branches:
+      - main  # Trigger on push to the 'main' branch
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest  # Use the latest Ubuntu for deployment
+
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js
+      uses: actions/setup-node@v2
+      with:
+        node-version: '14'  # Specify the Node.js version
+
+    - name: Install dependencies
+      run: |
+        npm install  # Install project dependencies (if any)
+
+    - name: Build the project
+      run: |
+        mkdir -p build && cp -r * build/  # Build step (for static websites)
+
+    - name: Set up AWS CLI
+      uses: aws-actions/configure-aws-credentials@v1
+      with:
+        aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+        aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+        aws-region: eu-north-1  # Region of your S3 bucket
+
+    - name: Deploy to S3
+      run: |
+        aws s3 sync ./build s3://my-githubaction-cd --delete  # Deploy to your S3 bucket

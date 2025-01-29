@@ -24,7 +24,7 @@ jobs:
 
     - name: Build the project
       run: |
-        mkdir -p build && cp -r * build/  # Build step (for static websites)
+        mkdir -p build && rsync -av --exclude 'build' ./ build/  # Build step (for static websites)
 
     - name: Set up AWS CLI
       uses: aws-actions/configure-aws-credentials@v1
